@@ -1,6 +1,6 @@
 site:
-  title: FIXME Course Title
-  start_page: REPLACEREPONAME::index.adoc
+  title: Breakfix 8
+  start_page: satellite-bfx-008::index.adoc
 
 content:
   sources:
