@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Guided solution (page 1 of 2) :: Breakfix 8</title>
+    <title>Guided Solution (1 of 1) :: Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</title>
     <link rel="prev" href="index.html">
-    <link rel="next" href="section2.html">
+    <link rel="next" href="../appendix/appendix.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../_/css/site.css">
     <script>var uiRootPath = '../../../_'</script>
@@ -15,7 +15,7 @@
   <nav class="navbar">
     <div class="navbar-brand">
       <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
-      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Breakfix 8</a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</a>
       <button class="navbar-burger" data-target="topbar-nav">
         <span></span>
         <span></span>
@@ -35,7 +35,7 @@
     <div class="panels">
 <div class="nav-panel-menu is-active" data-panel="menu">
   <nav class="nav-menu">
-    <h3 class="title"><a href="../index.html">Breakfix 8</a></h3>
+    <h3 class="title"><a href="../index.html">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</a></h3>
 <ul class="nav-list">
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
@@ -61,7 +61,10 @@
     <a class="nav-link" href="../chapter1/section1.html">Break-fix activity</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../chapter1/section2.html">Check your work</a>
+    <a class="nav-link" href="../chapter1/section2.html">Break-fix Scenario</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../chapter1/section3.html">Check your work</a>
   </li>
 </ul>
   </li>
@@ -74,10 +77,7 @@
     <a class="nav-link" href="index.html">Guided solution</a>
 <ul class="nav-list">
   <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="section1.html">Guided solution (page 1 of 2)</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="section2.html">Guided solution (page 2 of 2)</a>
+    <a class="nav-link" href="section1.html">Guided Solution (1 of 1)</a>
   </li>
 </ul>
   </li>
@@ -95,12 +95,12 @@
 </div>
 <div class="nav-panel-explore" data-panel="explore">
   <div class="context">
-    <span class="title">Breakfix 8</span>
+    <span class="title">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</span>
     <span class="version">1</span>
   </div>
   <ul class="components">
     <li class="component is-current">
-      <a class="title" href="../index.html">Breakfix 8</a>
+      <a class="title" href="../index.html">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</a>
       <ul class="versions">
         <li class="version is-current is-latest">
           <a href="../index.html">1</a>
@@ -118,9 +118,9 @@
   <a href="../index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
-    <li><a href="../index.html">Breakfix 8</a></li>
+    <li><a href="../index.html">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</a></li>
     <li><a href="index.html">Guided solution</a></li>
-    <li><a href="section1.html">Guided solution (page 1 of 2)</a></li>
+    <li><a href="section1.html">Guided Solution (1 of 1)</a></li>
   </ul>
 </nav>
 </div>
@@ -129,13 +129,170 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Guided solution (page 1 of 2)</h1>
+<h1 class="page">Guided Solution (1 of 1)</h1>
+<div class="sect1">
+<h2 id="_objectives"><a class="anchor" href="#_objectives"></a>Objectives</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Investigate why the services on the Satellite are in failed state.</p>
+</li>
+<li>
+<p>Solve the underlying issue and restore the services.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_instructions"><a class="anchor" href="#_instructions"></a>Instructions</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>FIXME: Provide step-by-step instructions here to resolve the issue.</p>
+<p>Log in to the <code>satellite</code> system and try restarting the services using <code>satellite-maintain service restart</code> while monitoring <code>/var/log/messages</code> log.</p>
+</div>
+<div class="paragraph">
+<p>Multiple sets of errors would be reported in the messages log.</p>
+</div>
+<div class="paragraph">
+<p>The following error will appear for the <code>postgresql</code> service:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>pulpcore-worker-7: psycopg.OperationalError: connection failed: could not connect to server: Connection refused
+pulpcore-worker-7: #011Is the server running on host "127.0.0.1" and accepting
+pulpcore-worker-7: #011TCP/IP connections on port 5432?</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This error indicates that <code>pulpcore-worker</code> was unable to connect to the PostgreSQL service.</p>
+</div>
+<div class="paragraph">
+<p>Next, check the HBA configuration file (<code>pg_hba.conf</code>) on the Satellite to verify whether connections to the service are permitted.</p>
+</div>
+<div class="paragraph">
+<p>postgresql service reads the HBA configuration from the top to the bottom.</p>
+</div>
+<div class="paragraph">
+<p>PostgreSQL reads the HBA configuration from top to bottom and applies the first matching rule. The following rule at the top of the file is causing PostgreSQL to reject all connections:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>host    all     all             0.0.0.0/0       reject</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Restore the file to its correct contents to allow connections to the service:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre># This file is managed by Puppet. DO NOT EDIT.
+# Rule Name: local access as postgres user for instance main
+# Description: none
+# Order: 1
+local   all     postgres                ident
+
+# Rule Name: allow iop network to access postgres
+# Description: Open up PostgreSQL for access from socket via md5/scram-256
+# Order: 2
+local   all     all             md5
+
+# Rule Name: local access to database with same name for instance main
+# Description: none
+# Order: 2
+local   all     all             ident
+
+# Rule Name: allow localhost TCP access to postgresql user for instance main
+# Description: none
+# Order: 3
+host    all     postgres        127.0.0.1/32    scram-sha-256
+
+# Rule Name: deny access to postgresql user for instance main
+# Description: none
+# Order: 4
+host    all     postgres        0.0.0.0/0       reject
+
+# Rule Name: allow access to all users for instance main
+# Description: none
+# Order: 100
+host    all     all     127.0.0.1/32    scram-sha-256
+
+# Rule Name: allow access to ipv6 localhost for instance main
+# Description: none
+# Order: 101
+host    all     all     ::1/128 scram-sha-256</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Attempting to edit the file will fail with a permission error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/var/lib/pgsql/data/pg_hba.conf: Operation not permitted</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Check whether the <code>immutable</code> bit is set on the file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre># lsattr /var/lib/pgsql/data/pg_hba.conf
+----i----------------- /var/lib/pgsql/data/pg_hba.conf</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Remove the immutable bit with the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>chattr -i /var/lib/pgsql/data/pg_hba.conf</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now edit the file to restore the correct HBA rules, then restart the services and verify their status:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>satellite-maintain service restart
+satellite-maintain service status -b</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The service may still be in failed state.</p>
+</div>
+<div class="paragraph">
+<p>The services may still be in a failed state. Check <code>/var/log/messages</code> for the current error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>systemd[1]: Starting PostgreSQL database server...
+postgresql-check-db-dir[7502]: Directory "/var/lib/pgsql/data" is missing or empty.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This error indicates that the PostgreSQL service is unable to access its data directory. Verify that the directory exists and has the correct permissions and ownership:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre># ll -d /var/lib/pgsql/data/
+drwx------. 20 postgres postgres 4096 Apr  3 03:33 /var/lib/pgsql/data/</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the permission and ownership does not match, correct them and restart the service again.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre># chown postgres:postgres /var/lib/pgsql/data
+# chmod 700 /var/lib/pgsql/data
+# satellite-maintain service restart</pre>
+</div>
+</div>
+</div>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="index.html">Guided solution</a></span>
-  <span class="next"><a href="section2.html">Guided solution (page 2 of 2)</a></span>
+  <span class="next"><a href="../appendix/appendix.html">Appendix</a></span>
 </nav>
 </article>
   </div>

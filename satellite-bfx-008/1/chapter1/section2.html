@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Check your work :: Breakfix 8</title>
+    <title>Break-fix Scenario :: Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</title>
     <link rel="prev" href="section1.html">
-    <link rel="next" href="../chapter2/index.html">
+    <link rel="next" href="section3.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../_/css/site.css">
     <script>var uiRootPath = '../../../_'</script>
@@ -15,7 +15,7 @@
   <nav class="navbar">
     <div class="navbar-brand">
       <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
-      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Breakfix 8</a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</a>
       <button class="navbar-burger" data-target="topbar-nav">
         <span></span>
         <span></span>
@@ -35,7 +35,7 @@
     <div class="panels">
 <div class="nav-panel-menu is-active" data-panel="menu">
   <nav class="nav-menu">
-    <h3 class="title"><a href="../index.html">Breakfix 8</a></h3>
+    <h3 class="title"><a href="../index.html">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</a></h3>
 <ul class="nav-list">
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
@@ -61,7 +61,10 @@
     <a class="nav-link" href="section1.html">Break-fix activity</a>
   </li>
   <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="section2.html">Check your work</a>
+    <a class="nav-link" href="section2.html">Break-fix Scenario</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="section3.html">Check your work</a>
   </li>
 </ul>
   </li>
@@ -74,10 +77,7 @@
     <a class="nav-link" href="../chapter2/index.html">Guided solution</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../chapter2/section1.html">Guided solution (page 1 of 2)</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../chapter2/section2.html">Guided solution (page 2 of 2)</a>
+    <a class="nav-link" href="../chapter2/section1.html">Guided Solution (1 of 1)</a>
   </li>
 </ul>
   </li>
@@ -95,12 +95,12 @@
 </div>
 <div class="nav-panel-explore" data-panel="explore">
   <div class="context">
-    <span class="title">Breakfix 8</span>
+    <span class="title">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</span>
     <span class="version">1</span>
   </div>
   <ul class="components">
     <li class="component is-current">
-      <a class="title" href="../index.html">Breakfix 8</a>
+      <a class="title" href="../index.html">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</a>
       <ul class="versions">
         <li class="version is-current is-latest">
           <a href="../index.html">1</a>
@@ -118,9 +118,9 @@
   <a href="../index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
-    <li><a href="../index.html">Breakfix 8</a></li>
+    <li><a href="../index.html">Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6</a></li>
     <li><a href="index.html">What’s in this break-fix?</a></li>
-    <li><a href="section2.html">Check your work</a></li>
+    <li><a href="section2.html">Break-fix Scenario</a></li>
   </ul>
 </nav>
 </div>
@@ -129,45 +129,83 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Check your work</h1>
-<div class="sect1">
-<h2 id="_follow_below_steps_in_the_lab_to_check_your_work"><a class="anchor" href="#_follow_below_steps_in_the_lab_to_check_your_work"></a>Follow below steps in the lab to check your work</h2>
+<h1 class="page">Break-fix Scenario</h1>
+<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>FIXME: Add the instructions to be followed in the lab environment to make sure the problem has been resolved. You may chose to remove this block if grading script is provided in the lab to check the work.</p>
+<p>Several services on the Satellite are in failed state.</p>
+</div>
+<div class="paragraph">
+<p>Here is the service status:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/ displaying redis                                 [OK]
+/ displaying postgresql                            [FAIL]
+- displaying pulpcore-api                          [OK]
+- displaying pulpcore-content                      [OK]
+- displaying pulpcore-worker@1.service             [FAIL]
+- displaying pulpcore-worker@2.service             [FAIL]
+- displaying pulpcore-worker@3.service             [OK]
+- displaying pulpcore-worker@4.service             [FAIL]
+- displaying pulpcore-worker@5.service             [FAIL]
+- displaying pulpcore-worker@6.service             [FAIL]
+- displaying pulpcore-worker@7.service             [OK]
+- displaying pulpcore-worker@8.service             [FAIL]
+- displaying tomcat                                [OK]
+- displaying dynflow-sidekiq@orchestrator          [FAIL]
+- displaying foreman                               [FAIL]
+- displaying httpd                                 [OK]
+- displaying dynflow-sidekiq@worker-1              [FAIL]
+- displaying dynflow-sidekiq@worker-hosts-queue-1  [FAIL]
+- displaying foreman-proxy                         [OK]
+- All services displayed                                              [FAIL]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here is the <code>hammer ping</code> output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Error: Timed out reading data from server</pre>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_check_your_work_using_the_grading_script"><a class="anchor" href="#_check_your_work_using_the_grading_script"></a>Check your work using the grading script</h2>
+<h2 id="_objectives"><a class="anchor" href="#_objectives"></a>Objectives</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Investigate why the services are in failed state.</p>
+</li>
+<li>
+<p>Solve the issue related to the services.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_recreate_scenario"><a class="anchor" href="#_recreate_scenario"></a>Recreate Scenario</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>After you have resolved the issue and met the success criteria, login to <code>FIXME</code> system as <code>FIXME</code> user and run the grading script as shown here to check your work:</p>
+<p>To recreate this scenario, run the <code>lab</code> script on the <code>bastion</code> server.</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">break-fix-script grade</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">lab break breakfix2</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Sample output</div>
 <div class="content">
-<pre>[root@classroom ~]# break-fix-script grade
-Initiating break-fix-script with option grade
-Grading.  Please wait.
-Success.
-COMPLETION CODE: &lt;check your output for this value&gt;
-Completed break-fix-script with option grade successfully</pre>
+<pre>[lab-user@bastion ~]$ lab break breakfix2
+Initiating /usr/local/bin/lab with option(s) break breakfix2
+Completed /usr/local/bin/lab with option(s) break breakfix2 successfully</pre>
 </div>
 </div>
-<div class="paragraph">
-<p>FIXME: Remove the below block if no grading script is provided to check the work in the break-fix activity. In this case make sure you use the above block to provide step-by-step instructions learner can follow to check their work.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_submit_the_completion_code"><a class="anchor" href="#_submit_the_completion_code"></a>Submit the completion code</h2>
-<div class="sectionbody">
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -175,29 +213,82 @@ Completed break-fix-script with option grade successfully</pre>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Skip this if not applicable for you.
+It may take 2-3 minutes to complete.
 </td>
 </tr>
 </table>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>For RedHat internal audience: Submit that completion code <a href="https://link-to-appropriate-lms.com" target="_blank" rel="noopener">here</a> to receive a grade for this training</p>
-</li>
-<li>
-<p>For RedHat partners: Submit that completion code <a href="https://link-to-appropriate-lms.com" target="_blank" rel="noopener">here</a> to receive a grade for this training</p>
-</li>
-</ul>
 </div>
+</div>
+<div class="sect1">
+<h2 id="_success_criteria"><a class="anchor" href="#_success_criteria"></a>Success Criteria</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>FIXME: Change the links in the above lines to the link for appropriate audience specific LMS where learner can provide completion code. Remove this block if submitting completion is not applicable.</p>
+<p>Ensure all services on the Satellite are running.</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">\ displaying redis                                 [OK]
+\ displaying postgresql                            [OK]
+| displaying pulpcore-api                          [OK]
+| displaying pulpcore-content                      [OK]
+| displaying pulpcore-worker@1.service             [OK]
+| displaying pulpcore-worker@2.service             [OK]
+| displaying tomcat                                [OK]
+| displaying dynflow-sidekiq@orchestrator          [OK]
+| displaying foreman                               [OK]
+| displaying httpd                                 [OK]
+| displaying dynflow-sidekiq@worker-1              [OK]
+| displaying dynflow-sidekiq@worker-hosts-queue-1  [OK]
+| displaying foreman-proxy                         [OK]
+| All services are running                                            [OK]</code></pre>
+</div>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">database:
+    Status:          ok
+    Server Response: Duration: 0ms
+cache:
+    servers:
+     1) Status:          ok
+        Server Response: Duration: 0ms
+advisor:
+    Status:          ok
+    Server Response: Duration: 233ms
+vulnerability:
+    Status:          ok
+    Server Response: Duration: 208ms
+candlepin:
+    Status:          ok
+    Server Response: Duration: 33ms
+candlepin_auth:
+    Status:          ok
+    Server Response: Duration: 25ms
+candlepin_events:
+    Status:          ok
+    message:         0 Processed, 0 Failed
+    Server Response: Duration: 0ms
+katello_events:
+    Status:          ok
+    message:         0 Processed, 0 Failed
+    Server Response: Duration: 1ms
+pulp3:
+    Status:          ok
+    Server Response: Duration: 319ms
+pulp3_content:
+    Status:          ok
+    Server Response: Duration: 52ms
+foreman_tasks:
+    Status:          ok
+    Server Response: Duration: 3ms</code></pre>
+</div>
 </div>
 </div>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="section1.html">Break-fix activity</a></span>
-  <span class="next"><a href="../chapter2/index.html">Guided solution</a></span>
+  <span class="next"><a href="section3.html">Check your work</a></span>
 </nav>
 </article>
   </div>
