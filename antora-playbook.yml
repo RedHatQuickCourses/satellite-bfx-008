@@ -1,5 +1,5 @@
 site:
-  title: Breakfix 8
+  title: "Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6"
   start_page: satellite-bfx-008::index.adoc
 
 content:

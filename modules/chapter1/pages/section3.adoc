@@ -1,0 +1,28 @@
+= Check your work
+
+== Check your work using the grading script
+
+After you have resolved the issue and met the success criteria, log in to the `bastion` system as a `lab-user` user and run the grading script as shown here to check your work:
+
+[source,bash,role=execute]
+----
+lab grade grade2
+----
+
+.Sample output
+----
+[root@classroom ~]# lab grade grade2
+...
+...
+TASK [Checking result] *********************************************************************************************************************************************************************************************************************
+ok: [satellite] => {
+    "msg": "Success. your alphanumeric code for completion is XXXXXX"
+}
+----
+
+== Submit the completion code
+
+Enter the complete code in the `Course Completion` section.
+
+image::course_completion.png[align=left,width=540,height=380,link=self,window=_blank]
+ Tip: click on the image to open in a new tab for better visibility

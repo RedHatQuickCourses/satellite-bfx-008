@@ -1,3 +1,6 @@
 = Appendix
 
-Content for Appendix...
+The issue happens when the permissions and the HBA configuration related to the postgresql instance of the Satellite are modified to restrict access to the database. Similar issues are documented in the following articles:
+
+* https://access.redhat.com/solutions/7129227
+* https://access.redhat.com/solutions/7017572

@@ -1,5 +1,5 @@
 name: satellite-bfx-008
-title: Breakfix 8
+title: "Break-fix Practice: Fixing PostgreSQL service on Red Hat Satellite 6"
 version: 1
 nav:
 - modules/ROOT/nav.adoc

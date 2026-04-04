@@ -1,3 +1,123 @@
-= Guided solution (page 1 of 2)
+= Guided Solution (1 of 1)
+:experimental:
 
-FIXME: Provide step-by-step instructions here to resolve the issue.
+== Objectives
+
+* Investigate why the services on the Satellite are in failed state.
+* Solve the underlying issue and restore the services.
+
+== Instructions
+
+Log in to the `satellite` system and try restarting the services using `satellite-maintain service restart` while monitoring `/var/log/messages` log.
+
+Multiple sets of errors would be reported in the messages log.
+
+The following error will appear for the `postgresql` service:
+
+----
+pulpcore-worker-7: psycopg.OperationalError: connection failed: could not connect to server: Connection refused
+pulpcore-worker-7: #011Is the server running on host "127.0.0.1" and accepting
+pulpcore-worker-7: #011TCP/IP connections on port 5432?
+----
+
+This error indicates that `pulpcore-worker` was unable to connect to the PostgreSQL service.
+
+Next, check the HBA configuration file (`pg_hba.conf`) on the Satellite to verify whether connections to the service are permitted.
+
+postgresql service reads the HBA configuration from the top to the bottom.
+
+PostgreSQL reads the HBA configuration from top to bottom and applies the first matching rule. The following rule at the top of the file is causing PostgreSQL to reject all connections:
+
+----
+host    all     all             0.0.0.0/0       reject
+----
+
+Restore the file to its correct contents to allow connections to the service:
+
+----
+# This file is managed by Puppet. DO NOT EDIT.
+# Rule Name: local access as postgres user for instance main
+# Description: none
+# Order: 1
+local   all     postgres                ident
+
+# Rule Name: allow iop network to access postgres
+# Description: Open up PostgreSQL for access from socket via md5/scram-256
+# Order: 2
+local   all     all             md5
+
+# Rule Name: local access to database with same name for instance main
+# Description: none
+# Order: 2
+local   all     all             ident
+
+# Rule Name: allow localhost TCP access to postgresql user for instance main
+# Description: none
+# Order: 3
+host    all     postgres        127.0.0.1/32    scram-sha-256
+
+# Rule Name: deny access to postgresql user for instance main
+# Description: none
+# Order: 4
+host    all     postgres        0.0.0.0/0       reject
+
+# Rule Name: allow access to all users for instance main
+# Description: none
+# Order: 100
+host    all     all     127.0.0.1/32    scram-sha-256
+
+# Rule Name: allow access to ipv6 localhost for instance main
+# Description: none
+# Order: 101
+host    all     all     ::1/128 scram-sha-256
+----
+
+Attempting to edit the file will fail with a permission error:
+
+----
+/var/lib/pgsql/data/pg_hba.conf: Operation not permitted
+----
+
+Check whether the `immutable` bit is set on the file:
+
+----
+# lsattr /var/lib/pgsql/data/pg_hba.conf
+----i----------------- /var/lib/pgsql/data/pg_hba.conf
+----
+
+Remove the immutable bit with the following command:
+
+----
+chattr -i /var/lib/pgsql/data/pg_hba.conf
+----
+
+Now edit the file to restore the correct HBA rules, then restart the services and verify their status:
+
+----
+satellite-maintain service restart
+satellite-maintain service status -b
+----
+
+The service may still be in failed state.
+
+The services may still be in a failed state. Check `/var/log/messages` for the current error:
+
+----
+systemd[1]: Starting PostgreSQL database server...
+postgresql-check-db-dir[7502]: Directory "/var/lib/pgsql/data" is missing or empty.
+----
+
+This error indicates that the PostgreSQL service is unable to access its data directory. Verify that the directory exists and has the correct permissions and ownership:
+
+----
+# ll -d /var/lib/pgsql/data/
+drwx------. 20 postgres postgres 4096 Apr  3 03:33 /var/lib/pgsql/data/
+----
+
+If the permission and ownership does not match, correct them and restart the service again.
+
+----
+# chown postgres:postgres /var/lib/pgsql/data
+# chmod 700 /var/lib/pgsql/data
+# satellite-maintain service restart
+----

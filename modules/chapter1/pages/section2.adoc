@@ -1,35 +1,120 @@
-= Check your work
+= Break-fix Scenario
 
-== Follow below steps in the lab to check your work
+Several services on the Satellite are in failed state. 
 
-FIXME: Add the instructions to be followed in the lab environment to make sure the problem has been resolved. You may chose to remove this block if grading script is provided in the lab to check the work.
+Here is the service status:
 
-== Check your work using the grading script
+----
+/ displaying redis                                 [OK]                         
+/ displaying postgresql                            [FAIL]                       
+- displaying pulpcore-api                          [OK]                         
+- displaying pulpcore-content                      [OK]                         
+- displaying pulpcore-worker@1.service             [FAIL]                       
+- displaying pulpcore-worker@2.service             [FAIL]                       
+- displaying pulpcore-worker@3.service             [OK]                         
+- displaying pulpcore-worker@4.service             [FAIL]                       
+- displaying pulpcore-worker@5.service             [FAIL]                       
+- displaying pulpcore-worker@6.service             [FAIL]                       
+- displaying pulpcore-worker@7.service             [OK]                         
+- displaying pulpcore-worker@8.service             [FAIL]                       
+- displaying tomcat                                [OK]                         
+- displaying dynflow-sidekiq@orchestrator          [FAIL]                       
+- displaying foreman                               [FAIL]                       
+- displaying httpd                                 [OK]                         
+- displaying dynflow-sidekiq@worker-1              [FAIL]                       
+- displaying dynflow-sidekiq@worker-hosts-queue-1  [FAIL]                       
+- displaying foreman-proxy                         [OK]                         
+- All services displayed                                              [FAIL] 
+----
 
-After you have resolved the issue and met the success criteria, login to `FIXME` system as `FIXME` user and run the grading script as shown here to check your work:
+Here is the `hammer ping` output:
+
+----
+Error: Timed out reading data from server
+----
+
+== Objectives
+
+* Investigate why the services are in failed state. 
+* Solve the issue related to the services.
+
+== Recreate Scenario
+
+To recreate this scenario, run the `lab` script on the `bastion` server.
 
 [source,bash,role=execute]
 ----
-break-fix-script grade
+lab break breakfix2
 ----
 
 .Sample output
 ----
-[root@classroom ~]# break-fix-script grade
-Initiating break-fix-script with option grade
-Grading.  Please wait.
-Success.
-COMPLETION CODE: <check your output for this value>
-Completed break-fix-script with option grade successfully
+[lab-user@bastion ~]$ lab break breakfix2
+Initiating /usr/local/bin/lab with option(s) break breakfix2
+Completed /usr/local/bin/lab with option(s) break breakfix2 successfully
 ----
 
-FIXME: Remove the below block if no grading script is provided to check the work in the break-fix activity. In this case make sure you use the above block to provide step-by-step instructions learner can follow to check their work.
+[NOTE]
+It may take 2-3 minutes to complete.
 
-== Submit the completion code
+== Success Criteria
 
-NOTE: Skip this if not applicable for you.
+Ensure all services on the Satellite are running. 
 
-- For RedHat internal audience: Submit that completion code https://link-to-appropriate-lms.com[here,window=_blank] to receive a grade for this training
-- For RedHat partners: Submit that completion code https://link-to-appropriate-lms.com[here,window=_blank] to receive a grade for this training
+[source,bash,role=execute]
+----
+\ displaying redis                                 [OK]                         
+\ displaying postgresql                            [OK]                         
+| displaying pulpcore-api                          [OK]                         
+| displaying pulpcore-content                      [OK]                         
+| displaying pulpcore-worker@1.service             [OK]                         
+| displaying pulpcore-worker@2.service             [OK]                         
+| displaying tomcat                                [OK]                         
+| displaying dynflow-sidekiq@orchestrator          [OK]                         
+| displaying foreman                               [OK]                         
+| displaying httpd                                 [OK]                         
+| displaying dynflow-sidekiq@worker-1              [OK]                         
+| displaying dynflow-sidekiq@worker-hosts-queue-1  [OK]                         
+| displaying foreman-proxy                         [OK]                         
+| All services are running                                            [OK]    
+----
 
-FIXME: Change the links in the above lines to the link for appropriate audience specific LMS where learner can provide completion code. Remove this block if submitting completion is not applicable.
+[source,bash,role=execute]
+----
+database:         
+    Status:          ok
+    Server Response: Duration: 0ms
+cache:            
+    servers: 
+     1) Status:          ok
+        Server Response: Duration: 0ms
+advisor:          
+    Status:          ok
+    Server Response: Duration: 233ms
+vulnerability:    
+    Status:          ok
+    Server Response: Duration: 208ms
+candlepin:        
+    Status:          ok
+    Server Response: Duration: 33ms
+candlepin_auth:   
+    Status:          ok
+    Server Response: Duration: 25ms
+candlepin_events: 
+    Status:          ok
+    message:         0 Processed, 0 Failed
+    Server Response: Duration: 0ms
+katello_events:   
+    Status:          ok
+    message:         0 Processed, 0 Failed
+    Server Response: Duration: 1ms
+pulp3:            
+    Status:          ok
+    Server Response: Duration: 319ms
+pulp3_content:    
+    Status:          ok
+    Server Response: Duration: 52ms
+foreman_tasks:    
+    Status:          ok
+    Server Response: Duration: 3ms
+----

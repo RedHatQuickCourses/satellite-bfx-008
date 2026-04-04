@@ -4,14 +4,12 @@
 
 **Type of issue:**
 
-FIXME: Describe an issue type/category that this specific issue falls into, like, "A Red Hat Enterprise Linux 7 system won't boot after a kernel update." Save issue-specific details for the break-fix scenario page.
-
-
+Services on the Satellite are not running.
 
 **What you should already know:**
 
-FIXME: This training assumes that you are a Red Hat Certified System Administrator (RHCSA) or have equivalent experience administrating Red Hat Enterprise Linux 7 or 8. FIXME - update this as needed
-
+- This training assumes that you are a Red Hat Certified System Administrator (RHCSA) or have equivalent experience administrating Red Hat Enterprise Linux 8 or 9. +
+- Administration of Red Hat Satellite 6.
 
 **How break-fix training works:**
 
