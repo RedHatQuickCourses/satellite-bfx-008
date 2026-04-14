@@ -135,12 +135,18 @@
 <div class="paragraph">
 <p>Several services on the Satellite are in failed state.</p>
 </div>
-<div class="paragraph">
+<div class="ulist">
+<ul>
+<li>
 <p>Here is the service status:</p>
-</div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre>/ displaying redis                                 [OK]
+<pre class="highlightjs highlight"><code class="language-none hljs">[lab-user@bastion ~]$ <strong>sudo ssh satellite</strong>
+[cloud-user@satellite ~]$ <strong>sudo su -</strong>
+[root@satellite ~]# <strong>satellite-maintain service status</strong>
+/ displaying redis                                 [OK]
 / displaying postgresql                            [FAIL]
 - displaying pulpcore-api                          [OK]
 - displaying pulpcore-content                      [OK]
@@ -159,16 +165,26 @@
 - displaying dynflow-sidekiq@worker-1              [FAIL]
 - displaying dynflow-sidekiq@worker-hosts-queue-1  [FAIL]
 - displaying foreman-proxy                         [OK]
-- All services displayed                                              [FAIL]</pre>
+- All services displayed                                              [FAIL]</code></pre>
 </div>
 </div>
-<div class="paragraph">
+</div>
+</div>
+</li>
+<li>
 <p>Here is the <code>hammer ping</code> output:</p>
-</div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre>Error: Timed out reading data from server</pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>hammer ping</strong>
+Error: Timed out reading data from server</code></pre>
 </div>
+</div>
+</div>
+</div>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -190,21 +206,23 @@
 <div class="sect1">
 <h2 id="_recreate_scenario"><a class="anchor" href="#_recreate_scenario"></a>Recreate Scenario</h2>
 <div class="sectionbody">
-<div class="paragraph">
+<div class="ulist">
+<ul>
+<li>
 <p>To recreate this scenario, run the <code>lab</code> script on the <code>bastion</code> server.</p>
-</div>
-<div class="listingblock execute">
+<div class="exampleblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">lab break breakfix2</code></pre>
-</div>
-</div>
 <div class="listingblock">
-<div class="title">Sample output</div>
 <div class="content">
-<pre>[lab-user@bastion ~]$ lab break breakfix2
+<pre class="highlightjs highlight"><code class="language-none hljs">[lab-user@bastion ~]$ lab break breakfix2
 Initiating /usr/local/bin/lab with option(s) break breakfix2
-Completed /usr/local/bin/lab with option(s) break breakfix2 successfully</pre>
+Completed /usr/local/bin/lab with option(s) break breakfix2 successfully</code></pre>
 </div>
+</div>
+</div>
+</div>
+</li>
+</ul>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -223,12 +241,16 @@ It may take 2-3 minutes to complete.
 <div class="sect1">
 <h2 id="_success_criteria"><a class="anchor" href="#_success_criteria"></a>Success Criteria</h2>
 <div class="sectionbody">
-<div class="paragraph">
+<div class="ulist">
+<ul>
+<li>
 <p>Ensure all services on the Satellite are running.</p>
-</div>
-<div class="listingblock execute">
+<div class="exampleblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">\ displaying redis                                 [OK]
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>satellite-maintain service status</strong>
+\ displaying redis                                 [OK]
 \ displaying postgresql                            [OK]
 | displaying pulpcore-api                          [OK]
 | displaying pulpcore-content                      [OK]
@@ -241,12 +263,10 @@ It may take 2-3 minutes to complete.
 | displaying dynflow-sidekiq@worker-1              [OK]
 | displaying dynflow-sidekiq@worker-hosts-queue-1  [OK]
 | displaying foreman-proxy                         [OK]
-| All services are running                                            [OK]</code></pre>
-</div>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">database:
+| All services are running                                            [OK]
+
+[root@satellite ~]# <strong>hammer ping</strong>
+database:
     Status:          ok
     Server Response: Duration: 0ms
 cache:
@@ -283,6 +303,11 @@ foreman_tasks:
     Status:          ok
     Server Response: Duration: 3ms</code></pre>
 </div>
+</div>
+</div>
+</div>
+</li>
+</ul>
 </div>
 </div>
 </div>
