@@ -136,7 +136,7 @@
 <div class="ulist">
 <ul>
 <li>
-<p>Investigate why the services on the Satellite are in failed state.</p>
+<p>Investigate why the services on the Satellite are in a failed state.</p>
 </li>
 <li>
 <p>Solve the underlying issue and restore the services.</p>
@@ -151,17 +151,35 @@
 <div class="paragraph">
 <p>Log in to the <code>satellite</code> system and try restarting the services using <code>satellite-maintain service restart</code> while monitoring <code>/var/log/messages</code> log.</p>
 </div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">[lab-user@bastion ~]$ <strong>sudo ssh satellite</strong>
+[cloud-user@satellite ~]$ <strong>sudo su -</strong>
+[root@satellite ~]# <strong>satellite-maintain service restart</strong></code></pre>
+</div>
+</div>
+</div>
+</div>
 <div class="paragraph">
 <p>Multiple sets of errors would be reported in the messages log.</p>
 </div>
 <div class="paragraph">
 <p>The following error will appear for the <code>postgresql</code> service:</p>
 </div>
+<div class="paragraph">
+<p><code>/var/log/messages</code>:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre>pulpcore-worker-7: psycopg.OperationalError: connection failed: could not connect to server: Connection refused
+<pre class="highlightjs highlight"><code class="language-none hljs">pulpcore-worker-7: psycopg.OperationalError: connection failed: could not connect to server: Connection refused
 pulpcore-worker-7: #011Is the server running on host "127.0.0.1" and accepting
-pulpcore-worker-7: #011TCP/IP connections on port 5432?</pre>
+pulpcore-worker-7: #011TCP/IP connections on port 5432?</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
@@ -171,22 +189,31 @@ pulpcore-worker-7: #011TCP/IP connections on port 5432?</pre>
 <p>Next, check the HBA configuration file (<code>pg_hba.conf</code>) on the Satellite to verify whether connections to the service are permitted.</p>
 </div>
 <div class="paragraph">
-<p>postgresql service reads the HBA configuration from the top to the bottom.</p>
-</div>
-<div class="paragraph">
 <p>PostgreSQL reads the HBA configuration from top to bottom and applies the first matching rule. The following rule at the top of the file is causing PostgreSQL to reject all connections:</p>
 </div>
+<div class="paragraph">
+<p><code>/var/lib/pgsql/data/pg_hba.conf</code>:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre>host    all     all             0.0.0.0/0       reject</pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">host    all     all             0.0.0.0/0       reject</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
 <p>Restore the file to its correct contents to allow connections to the service:</p>
 </div>
+<div class="paragraph">
+<p><code>/var/lib/pgsql/data/pg_hba.conf</code>:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre># This file is managed by Puppet. DO NOT EDIT.
+<pre class="highlightjs highlight"><code class="language-none hljs"># This file is managed by Puppet. DO NOT EDIT.
 # Rule Name: local access as postgres user for instance main
 # Description: none
 # Order: 1
@@ -220,72 +247,102 @@ host    all     all     127.0.0.1/32    scram-sha-256
 # Rule Name: allow access to ipv6 localhost for instance main
 # Description: none
 # Order: 101
-host    all     all     ::1/128 scram-sha-256</pre>
+host    all     all     ::1/128 scram-sha-256</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
 <p>Attempting to edit the file will fail with a permission error:</p>
 </div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre>/var/lib/pgsql/data/pg_hba.conf: Operation not permitted</pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">/var/lib/pgsql/data/pg_hba.conf: Operation not permitted</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
 <p>Check whether the <code>immutable</code> bit is set on the file:</p>
 </div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre># lsattr /var/lib/pgsql/data/pg_hba.conf
-----i----------------- /var/lib/pgsql/data/pg_hba.conf</pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>lsattr /var/lib/pgsql/data/pg_hba.conf</strong>
+----i----------------- /var/lib/pgsql/data/pg_hba.conf</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
 <p>Remove the immutable bit with the following command:</p>
 </div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre>chattr -i /var/lib/pgsql/data/pg_hba.conf</pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>chattr -i /var/lib/pgsql/data/pg_hba.conf</strong></code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
-<p>Now edit the file to restore the correct HBA rules, then restart the services and verify their status:</p>
+<p>Now, edit the file to restore the correct HBA rules, then restart the services and verify their status:</p>
 </div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre>satellite-maintain service restart
-satellite-maintain service status -b</pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>satellite-maintain service restart</strong>
+[root@satellite ~]# <strong>satellite-maintain service status -b</strong></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>The service may still be in failed state.</p>
+</div>
 </div>
 <div class="paragraph">
 <p>The services may still be in a failed state. Check <code>/var/log/messages</code> for the current error:</p>
 </div>
+<div class="paragraph">
+<p><code>/var/log/messages</code>:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre>systemd[1]: Starting PostgreSQL database server...
-postgresql-check-db-dir[7502]: Directory "/var/lib/pgsql/data" is missing or empty.</pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">systemd[1]: Starting PostgreSQL database server...
+postgresql-check-db-dir[7502]: Directory "/var/lib/pgsql/data" is missing or empty.</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
-<p>This error indicates that the PostgreSQL service is unable to access its data directory. Verify that the directory exists and has the correct permissions and ownership:</p>
+<p>This error indicates that the PostgreSQL service is unable to access its data directory. Verify that the directory exists and has the correct permissions and ownership.</p>
 </div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre># ll -d /var/lib/pgsql/data/
-drwx------. 20 postgres postgres 4096 Apr  3 03:33 /var/lib/pgsql/data/</pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>ll -d /var/lib/pgsql/data/</strong>
+drwx------. 20 postgres postgres 4096 Apr  3 03:33 /var/lib/pgsql/data/</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
-<p>If the permission and ownership does not match, correct them and restart the service again.</p>
+<p>If the permissions and ownership do not match, correct them and restart the service.</p>
 </div>
+<div class="exampleblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre># chown postgres:postgres /var/lib/pgsql/data
-# chmod 700 /var/lib/pgsql/data
-# satellite-maintain service restart</pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>chown postgres:postgres /var/lib/pgsql/data</strong>
+[root@satellite ~]# <strong>chmod 700 /var/lib/pgsql/data</strong>
+[root@satellite ~]# <strong>satellite-maintain service restart</strong></code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
