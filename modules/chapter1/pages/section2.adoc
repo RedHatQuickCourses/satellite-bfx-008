@@ -2,9 +2,14 @@
 
 Several services on the Satellite are in failed state. 
 
-Here is the service status:
-
+* Here is the service status:
++
+====
+[source,subs="verbatim,quotes"]
 ----
+[lab-user@bastion ~]$ **sudo ssh satellite**
+[cloud-user@satellite ~]$ **sudo su -**
+[root@satellite ~]# **satellite-maintain service status**
 / displaying redis                                 [OK]                         
 / displaying postgresql                            [FAIL]                       
 - displaying pulpcore-api                          [OK]                         
@@ -26,12 +31,17 @@ Here is the service status:
 - displaying foreman-proxy                         [OK]                         
 - All services displayed                                              [FAIL] 
 ----
+====
 
-Here is the `hammer ping` output:
-
+* Here is the `hammer ping` output:
++
+====
+[source,subs="verbatim,quotes"]
 ----
+[root@satellite ~]# **hammer ping**
 Error: Timed out reading data from server
 ----
+====
 
 == Objectives
 
@@ -40,29 +50,28 @@ Error: Timed out reading data from server
 
 == Recreate Scenario
 
-To recreate this scenario, run the `lab` script on the `bastion` server.
-
-[source,bash,role=execute]
-----
-lab break breakfix2
-----
-
-.Sample output
+* To recreate this scenario, run the `lab` script on the `bastion` server.
++
+====
+[source,subs="verbatim,quotes"]
 ----
 [lab-user@bastion ~]$ lab break breakfix2
 Initiating /usr/local/bin/lab with option(s) break breakfix2
 Completed /usr/local/bin/lab with option(s) break breakfix2 successfully
 ----
+====
 
 [NOTE]
 It may take 2-3 minutes to complete.
 
 == Success Criteria
 
-Ensure all services on the Satellite are running. 
-
-[source,bash,role=execute]
+* Ensure all services on the Satellite are running. 
++
+====
+[source,subs="verbatim,quotes"]
 ----
+[root@satellite ~]# **satellite-maintain service status**
 \ displaying redis                                 [OK]                         
 \ displaying postgresql                            [OK]                         
 | displaying pulpcore-api                          [OK]                         
@@ -77,10 +86,8 @@ Ensure all services on the Satellite are running.
 | displaying dynflow-sidekiq@worker-hosts-queue-1  [OK]                         
 | displaying foreman-proxy                         [OK]                         
 | All services are running                                            [OK]    
-----
 
-[source,bash,role=execute]
-----
+[root@satellite ~]# **hammer ping**
 database:         
     Status:          ok
     Server Response: Duration: 0ms
@@ -118,3 +125,4 @@ foreman_tasks:
     Status:          ok
     Server Response: Duration: 3ms
 ----
+====
