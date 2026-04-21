@@ -8,49 +8,37 @@
 
 == Instructions
 
-Log in to the `satellite` system and try restarting the services using `satellite-maintain service restart` while monitoring `/var/log/messages` log.
-
-====
+* Log in to the `satellite` system and try restarting the services using `satellite-maintain service restart` while monitoring `/var/log/messages` log.
++
 [source,subs="verbatim,quotes"]
 ----
 [lab-user@bastion ~]$ **sudo ssh satellite**
 [cloud-user@satellite ~]$ **sudo su -**
 [root@satellite ~]# **satellite-maintain service restart**
 ----
-====
 
-Multiple sets of errors would be reported in the messages log.
-
-The following error will appear for the `postgresql` service:
-
-`/var/log/messages`:
-====
+* Multiple sets of errors would be reported in the messages log. The following error will appear for the `postgresql` service in `/var/log/messages`:
++
 [source,subs="verbatim,quotes"]
 ----
 pulpcore-worker-7: psycopg.OperationalError: connection failed: could not connect to server: Connection refused
 pulpcore-worker-7: #011Is the server running on host "127.0.0.1" and accepting
 pulpcore-worker-7: #011TCP/IP connections on port 5432?
 ----
-====
-
++
 This error indicates that `pulpcore-worker` was unable to connect to the PostgreSQL service.
 
-Next, check the HBA configuration file (`pg_hba.conf`) on the Satellite to verify whether connections to the service are permitted.
+* Next, check the HBA configuration file (`pg_hba.conf`) on the Satellite to verify whether connections to the service are permitted.
 
-PostgreSQL reads the HBA configuration from top to bottom and applies the first matching rule. The following rule at the top of the file is causing PostgreSQL to reject all connections:
-
-`/var/lib/pgsql/data/pg_hba.conf`:
-====
+* PostgreSQL reads the HBA configuration from top to bottom and applies the first matching rule. The following rule at the top of the file is causing PostgreSQL to reject all connections in `/var/lib/pgsql/data/pg_hba.conf`:
++
 [source,subs="verbatim,quotes"]
 ----
 host    all     all             0.0.0.0/0       reject
 ----
-====
 
-Restore the file to its correct contents to allow connections to the service:
-
-`/var/lib/pgsql/data/pg_hba.conf`:
-====
+* Restore the file to its correct contents to allow connections to the service in `/var/lib/pgsql/data/pg_hba.conf`:
++
 [source,subs="verbatim,quotes"]
 ----
 # This file is managed by Puppet. DO NOT EDIT.
@@ -89,74 +77,60 @@ host    all     all     127.0.0.1/32    scram-sha-256
 # Order: 101
 host    all     all     ::1/128 scram-sha-256
 ----
-====
 
-Attempting to edit the file will fail with a permission error:
-
-====
+* Attempting to edit the file will fail with a permission error:
++
 [source,subs="verbatim,quotes"]
 ----
 /var/lib/pgsql/data/pg_hba.conf: Operation not permitted
 ----
-====
 
-Check whether the `immutable` bit is set on the file:
-
-====
+* Check whether the `immutable` bit is set on the file:
++
 [source,subs="verbatim,quotes"]
 ----
 [root@satellite ~]# **lsattr /var/lib/pgsql/data/pg_hba.conf**
 ----i----------------- /var/lib/pgsql/data/pg_hba.conf
 ----
-====
 
-Remove the immutable bit with the following command:
-
-====
+* Remove the immutable bit with the following command:
++
 [source,subs="verbatim,quotes"]
 ----
 [root@satellite ~]# **chattr -i /var/lib/pgsql/data/pg_hba.conf**
 ----
-====
 
-Now, edit the file to restore the correct HBA rules, then restart the services and verify their status:
-
-====
+* Now, edit the file to restore the correct HBA rules, then restart the services and verify their status:
++
 [source,subs="verbatim,quotes"]
 ----
 [root@satellite ~]# **satellite-maintain service restart**
 [root@satellite ~]# **satellite-maintain service status -b**
 ----
-====
 
-The services may still be in a failed state. Check `/var/log/messages` for the current error:
-
-`/var/log/messages`:
-====
+* The services may still be in a failed state. Check `/var/log/messages` for the current error:
++
 [source,subs="verbatim,quotes"]
 ----
 systemd[1]: Starting PostgreSQL database server...
 postgresql-check-db-dir[7502]: Directory "/var/lib/pgsql/data" is missing or empty.
 ----
-====
++
+This error indicates that the PostgreSQL service is unable to access its data directory. 
 
-This error indicates that the PostgreSQL service is unable to access its data directory. Verify that the directory exists and has the correct permissions and ownership. 
-
-====
+* Verify that the directory exists and has the correct permissions and ownership. 
++
 [source,subs="verbatim,quotes"]
 ----
 [root@satellite ~]# **ll -d /var/lib/pgsql/data/**
 drwx------. 20 postgres postgres 4096 Apr  3 03:33 /var/lib/pgsql/data/
 ----
-====
 
-If the permissions and ownership do not match, correct them and restart the service.
-
-====
+* If the permissions and ownership do not match, correct them and restart the service.
++
 [source,subs="verbatim,quotes"]
 ----
 [root@satellite ~]# **chown postgres:postgres /var/lib/pgsql/data**
 [root@satellite ~]# **chmod 700 /var/lib/pgsql/data**
 [root@satellite ~]# **satellite-maintain service restart**
 ----
-====
