@@ -3,7 +3,7 @@
 == Instructions to Launch Your Lab on the Red Hat Demo Platform (RHDP)
 
 . **Log in** to the xref:#RHDP-Portal-Links[RHDP portal]
-. **Search** for the catalog entry: **RedHat Satellite Troubleshooting Break-fix lab**.
+. **Search** for the catalog entry: **https://catalog.demo.redhat.com/catalog?item=babylon-catalog-prod/pert.satellite6-17-bfx.prod&utm_source=webapp&utm_medium=share-link[Product Enablement: Red Hat Satellite 6.17 Break-fix lab]**.
 . **Click** on the catalog entry in the search results.
 . On the catalog page, **click** the **Order** button.
 . **Fill out** the required details in the order form.
