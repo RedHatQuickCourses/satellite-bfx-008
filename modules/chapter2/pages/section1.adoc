@@ -21,26 +21,31 @@
 +
 [source,subs="verbatim,quotes"]
 ----
+[root@satellite ~]# less **/var/log/messages**
+...
 pulpcore-worker-7: psycopg.OperationalError: connection failed: could not connect to server: Connection refused
 pulpcore-worker-7: #011Is the server running on host "127.0.0.1" and accepting
 pulpcore-worker-7: #011TCP/IP connections on port 5432?
+...
 ----
 +
 This error indicates that `pulpcore-worker` was unable to connect to the PostgreSQL service.
 
-* Next, check the HBA configuration file (`pg_hba.conf`) on the Satellite to verify whether connections to the service are permitted.
-
-* PostgreSQL reads the HBA configuration from top to bottom and applies the first matching rule. The following rule at the top of the file is causing PostgreSQL to reject all connections in `/var/lib/pgsql/data/pg_hba.conf`:
+* Next, check the HBA configuration file (`pg_hba.conf`) on the Satellite to verify whether connections to the service are permitted. PostgreSQL reads the HBA configuration from top to bottom and applies the first matching rule. The following rule at the top of the file is causing PostgreSQL to reject all connections in `/var/lib/pgsql/data/pg_hba.conf`:
 +
 [source,subs="verbatim,quotes"]
 ----
+[root@satellite ~]# less **/var/lib/pgsql/data/pg_hba.conf**
+...
 host    all     all             0.0.0.0/0       reject
+...
 ----
 
-* Restore the file to its correct contents to allow connections to the service in `/var/lib/pgsql/data/pg_hba.conf`:
+* Restore the file to its correct contents to allow connections to the service in `/var/lib/pgsql/data/pg_hba.conf` with the correct settings as shown below:
 +
 [source,subs="verbatim,quotes"]
 ----
+[root@satellite ~]# less **/var/lib/pgsql/data/pg_hba.conf**
 # This file is managed by Puppet. DO NOT EDIT.
 # Rule Name: local access as postgres user for instance main
 # Description: none
@@ -78,7 +83,7 @@ host    all     all     127.0.0.1/32    scram-sha-256
 host    all     all     ::1/128 scram-sha-256
 ----
 
-* Attempting to edit the file will fail with a permission error:
+* Notice that attempting to edit the file will fail with a permission error:
 +
 [source,subs="verbatim,quotes"]
 ----
@@ -112,8 +117,11 @@ host    all     all     ::1/128 scram-sha-256
 +
 [source,subs="verbatim,quotes"]
 ----
+[root@satellite ~]# less **/var/log/messages**
+...
 systemd[1]: Starting PostgreSQL database server...
 postgresql-check-db-dir[7502]: Directory "/var/lib/pgsql/data" is missing or empty.
+...
 ----
 +
 This error indicates that the PostgreSQL service is unable to access its data directory. 
@@ -126,11 +134,18 @@ This error indicates that the PostgreSQL service is unable to access its data di
 drwx------. 20 postgres postgres 4096 Apr  3 03:33 /var/lib/pgsql/data/
 ----
 
-* If the permissions and ownership do not match, correct them and restart the service.
+* If the permissions and ownership do not match, correct them.
 +
 [source,subs="verbatim,quotes"]
 ----
 [root@satellite ~]# **chown -R postgres:postgres /var/lib/pgsql/data**
 [root@satellite ~]# **chmod -R 700 /var/lib/pgsql/data**
+----
+
+* Restart the services and verify their status and confirm the issue is now resolved:
++
+[source,subs="verbatim,quotes"]
+----
 [root@satellite ~]# **satellite-maintain service restart**
+[root@satellite ~]# **satellite-maintain service status -b**
 ----
