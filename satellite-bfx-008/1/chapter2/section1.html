@@ -164,9 +164,12 @@
 <p>Multiple sets of errors would be reported in the messages log. The following error will appear for the <code>postgresql</code> service in <code>/var/log/messages</code>:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">pulpcore-worker-7: psycopg.OperationalError: connection failed: could not connect to server: Connection refused
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# less <strong>/var/log/messages</strong>
+...
+pulpcore-worker-7: psycopg.OperationalError: connection failed: could not connect to server: Connection refused
 pulpcore-worker-7: #011Is the server running on host "127.0.0.1" and accepting
-pulpcore-worker-7: #011TCP/IP connections on port 5432?</code></pre>
+pulpcore-worker-7: #011TCP/IP connections on port 5432?
+...</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -174,21 +177,22 @@ pulpcore-worker-7: #011TCP/IP connections on port 5432?</code></pre>
 </div>
 </li>
 <li>
-<p>Next, check the HBA configuration file (<code>pg_hba.conf</code>) on the Satellite to verify whether connections to the service are permitted.</p>
-</li>
-<li>
-<p>PostgreSQL reads the HBA configuration from top to bottom and applies the first matching rule. The following rule at the top of the file is causing PostgreSQL to reject all connections in <code>/var/lib/pgsql/data/pg_hba.conf</code>:</p>
+<p>Next, check the HBA configuration file (<code>pg_hba.conf</code>) on the Satellite to verify whether connections to the service are permitted. PostgreSQL reads the HBA configuration from top to bottom and applies the first matching rule. The following rule at the top of the file is causing PostgreSQL to reject all connections in <code>/var/lib/pgsql/data/pg_hba.conf</code>:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">host    all     all             0.0.0.0/0       reject</code></pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# less <strong>/var/lib/pgsql/data/pg_hba.conf</strong>
+...
+host    all     all             0.0.0.0/0       reject
+...</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>Restore the file to its correct contents to allow connections to the service in <code>/var/lib/pgsql/data/pg_hba.conf</code>:</p>
+<p>Restore the file to its correct contents to allow connections to the service in <code>/var/lib/pgsql/data/pg_hba.conf</code> with the correct settings as shown below:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs"># This file is managed by Puppet. DO NOT EDIT.
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# less <strong>/var/lib/pgsql/data/pg_hba.conf</strong>
+# This file is managed by Puppet. DO NOT EDIT.
 # Rule Name: local access as postgres user for instance main
 # Description: none
 # Order: 1
@@ -227,7 +231,7 @@ host    all     all     ::1/128 scram-sha-256</code></pre>
 </div>
 </li>
 <li>
-<p>Attempting to edit the file will fail with a permission error:</p>
+<p>Notice that attempting to edit the file will fail with a permission error:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-none hljs">/var/lib/pgsql/data/pg_hba.conf: Operation not permitted</code></pre>
@@ -264,8 +268,11 @@ host    all     all     ::1/128 scram-sha-256</code></pre>
 <p>The services may still be in a failed state. Check <code>/var/log/messages</code> for the current error:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">systemd[1]: Starting PostgreSQL database server...
-postgresql-check-db-dir[7502]: Directory "/var/lib/pgsql/data" is missing or empty.</code></pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# less <strong>/var/log/messages</strong>
+...
+systemd[1]: Starting PostgreSQL database server...
+postgresql-check-db-dir[7502]: Directory "/var/lib/pgsql/data" is missing or empty.
+...</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -282,12 +289,20 @@ drwx------. 20 postgres postgres 4096 Apr  3 03:33 /var/lib/pgsql/data/</code></
 </div>
 </li>
 <li>
-<p>If the permissions and ownership do not match, correct them and restart the service.</p>
+<p>If the permissions and ownership do not match, correct them.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>chown -R postgres:postgres /var/lib/pgsql/data</strong>
-[root@satellite ~]# <strong>chmod -R 700 /var/lib/pgsql/data</strong>
-[root@satellite ~]# <strong>satellite-maintain service restart</strong></code></pre>
+[root@satellite ~]# <strong>chmod -R 700 /var/lib/pgsql/data</strong></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Restart the services and verify their status and confirm the issue is now resolved:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>satellite-maintain service restart</strong>
+[root@satellite ~]# <strong>satellite-maintain service status -b</strong></code></pre>
 </div>
 </div>
 </li>
