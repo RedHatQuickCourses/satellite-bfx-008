@@ -285,8 +285,8 @@ drwx------. 20 postgres postgres 4096 Apr  3 03:33 /var/lib/pgsql/data/</code></
 <p>If the permissions and ownership do not match, correct them and restart the service.</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>chown postgres:postgres /var/lib/pgsql/data</strong>
-[root@satellite ~]# <strong>chmod 700 /var/lib/pgsql/data</strong>
+<pre class="highlightjs highlight"><code class="language-none hljs">[root@satellite ~]# <strong>chown -R postgres:postgres /var/lib/pgsql/data</strong>
+[root@satellite ~]# <strong>chmod -R 700 /var/lib/pgsql/data</strong>
 [root@satellite ~]# <strong>satellite-maintain service restart</strong></code></pre>
 </div>
 </div>
